@@ -16,17 +16,6 @@ and writing down what happened instead of what the docs say should happen:
   `bedrock-websearch:ExternalWebAccess` doesn't get an error — Search
   still succeeds, Fetch just 403s, and the model reports it couldn't
   reach the web. Easy to misdiagnose as a model problem.
-- **The documented "knowledge graph" result shape never showed up.**
-  AWS's docs say a result is a knowledge-graph fact when `title`/`url`
-  come back null. Across varied factual queries against a live Gateway,
-  every result had both populated. The code still checks for the
-  null-title case defensively, but [`compare.py`](src/agentcore_websearch/compare.py)
-  reports what was actually observed, not what the docs promise.
-- **Tool names with repeated underscores break Nova's tool calling.**
-  `amazon.nova-pro-v1:0` deterministically fails ("Model produced invalid
-  sequence as part of ToolUse") on MCP tool names like
-  `web-search-tool___WebSearch`. Collapsing repeated separators to one
-  underscore fixes it — see [`bedrock_client.py`](src/agentcore_websearch/bedrock_client.py).
 - **Two integration paths, two different pricing models.** The Gateway's
   Web Search connector bills a flat $7 per 1,000 queries. Bedrock's
   native Web Search tool (Search + Fetch, invoked by the model's own
