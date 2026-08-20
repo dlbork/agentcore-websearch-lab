@@ -1,0 +1,11 @@
+<div class="card">
+  <p>
+    <span class="badge {{ 'badge-kg' if cache_hit else 'badge-web' }}">
+      {{ 'served from cache — not billed' if cache_hit else 'billed query' }}
+    </span>
+    <span class="badge" style="background: rgba(111,179,255,0.15); color: var(--accent);">
+      {{ 'cache lookup' if cache_hit else 'AWS API call' }}: {{ "%.0f"|format(elapsed_ms) }} ms
+    </span>
+  </p>
+  <pre>{{ response_json }}</pre>
+</div>

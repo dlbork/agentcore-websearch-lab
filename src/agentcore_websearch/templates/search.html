@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Web Search — Raw tools/call{% endblock %}
+{% block content %}
+<h2>Web Search — Raw <code>tools/call</code></h2>
+<p class="intro">
+  This is the actual product: one <code>tools/call</code> against the Web
+  Search connector, showing the unformatted response before anything
+  classifies, caches, or prettifies it. If you're deciding whether this
+  connector is good enough for your use case, this is the page that
+  answers it — real results, real fields, real latency.
+</p>
+{% if not gateway_ready %}
+  <p class="status-missing">Gateway isn't ready yet — <a href="/gateway">provision it first</a>.</p>
+{% else %}
+  <p class="why">
+    <strong>What's happening:</strong> your query and <code>maxResults</code>
+    get sent as the MCP <code>tools/call</code> arguments to
+    <code>{{ tool_name }}</code>. <strong>Why you should care:</strong> this
+    is also the only page that directly shows the $7/1,000-query cost in
+    action — repeat the same query and it's served from cache instead of
+    billing again (check the <a href="/costs">ledger</a>).
+  </p>
+  <form hx-post="/search" hx-target="#search-result" hx-swap="innerHTML">
+    <label for="query">query</label>
+    <input type="text" id="query" name="query" value="who is the CEO of Amazon" required>
+    <label for="max_results">maxResults (1-25)</label>
+    <input type="number" id="max_results" name="max_results" value="5" min="1" max="25">
+    <button type="submit">Call web-search-tool</button>
+  </form>
+  <div id="search-result"></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+[project]
+name = "agentcore-websearch"
+version = "0.1.0"
+description = "Learning app for Amazon Bedrock AgentCore Web Search"
+authors = [
+    { name = "Dan Bork", email = "dan@borkster.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "aws-bedrock-token-generator>=1.1.0",
+    "boto3>=1.43.74",
+    "fastapi>=0.141.1",
+    "jinja2>=3.1.6",
+    "mcp>=1.23.1,<2.0.0",
+    "mcp-proxy-for-aws>=1.1.6",
+    "openai>=3.3.1",
+    "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
+    "uvicorn[standard]>=0.52.4",
+]
+
+[project.scripts]
+agentcore-websearch-provision = "agentcore_websearch.provisioning:cli"
+
+[build-system]
+requires = ["uv_build>=0.10.7,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

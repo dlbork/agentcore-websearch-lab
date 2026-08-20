@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cost_badge %}
+{% block title %}AgentCore Gateway Status{% endblock %}
+{% block content %}
+<h2>AgentCore Gateway Status</h2>
+<p class="intro">
+  A hands-on tour of Amazon Bedrock AgentCore's Web Search connector — a
+  managed tool that gives AI agents real-time web search without you
+  standing up your own search API. Each page below exercises one distinct
+  piece of it, from the raw plumbing to a working agent loop, so you see
+  both what the feature does and how you'd actually build against it.
+</p>
+
+<div class="card">
+  <h3>Gateway &amp; Web Search Connector Setup</h3>
+  <p class="why">
+    <strong>What it is:</strong> the AWS infrastructure everything else on
+    this site depends on — an AgentCore Gateway plus a Web Search connector
+    target, and the IAM roles that let them talk to each other.
+    <strong>Why you should care:</strong> this is the plumbing every
+    tutorial skips. Nothing else works until this exists.
+  </p>
+  {% if gateway %}
+    <p>Gateway: <strong class="status-{{ 'ready' if gateway.gateway_status == 'READY' else 'pending' }}">{{ gateway.gateway_status }}</strong></p>
+    <p><code>{{ gateway.gateway_url }}</code></p>
+    <p>Targets: {% for t in gateway.targets %}{{ t.id }} ({{ t.status }}){% if not loop.last %}, {% endif %}{% endfor %}</p>
+  {% else %}
+    <p class="status-missing">No Gateway provisioned yet.</p>
+  {% endif %}
+  <a href="/gateway"><button>Gateway &amp; Web Search Connector Setup →</button></a>
+</div>
+
+<div class="card">
+  <h3>Query Ledger</h3>
+  <p class="why">
+    <strong>What it is:</strong> a running count of every call this app has
+    made to the Web Search connector, and what it cost.
+    <strong>Why you should care:</strong> every query is real money —
+    $7 per 1,000 — so it's worth seeing the meter run rather than
+    discovering the bill later.
+  </p>
+  <p>{{ cost_badge(totals) }}</p>
+  <a href="/costs"><button>Query Ledger ($7 / 1,000 Queries) →</button></a>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>MCP Tool Discovery</h3>
+    <p class="why">
+      <strong>What:</strong> a raw <code>tools/list</code> call — the same
+      discovery step any MCP client makes before it can use the connector.
+      <strong>Why:</strong> shows the actual tool schema AWS exposes, not
+      the paraphrased version in their blog post.
+    </p>
+    <a href="/tools">MCP Tool Discovery (tools/list) →</a>
+  </div>
+  <div class="card">
+    <h3>Raw Web Search</h3>
+    <p class="why">
+      <strong>What:</strong> one <code>tools/call</code>, unformatted JSON
+      response. <strong>Why:</strong> see the wire format before any
+      classification or UI touches it.
+    </p>
+    <a href="/search">Web Search — Raw tools/call →</a>
+  </div>
+  <div class="card">
+    <h3>Knowledge Graph vs. Web Snippet</h3>
+    <p class="why">
+      <strong>What:</strong> tests AWS's claim that factual queries return a
+      distinct knowledge-graph result shape. <strong>Why:</strong> it's an
+      honest empirical check, not a guaranteed demo — worth knowing before
+      you design around it.
+    </p>
+    <a href="/compare">Knowledge Graph vs. Web Snippet →</a>
+  </div>
+  <div class="card">
+    <h3>Agentic Tool-Calling Loop</h3>
+    <p class="why">
+      <strong>What:</strong> a hand-rolled loop where an LLM decides on its
+      own whether to search. <strong>Why:</strong> this is the actual
+      "how do I build with it" payoff — every decision streams live,
+      nothing hidden inside a framework.
+    </p>
+    <a href="/agent">Agentic Tool-Calling Loop — Hand-Rolled →</a>
+  </div>
+  <div class="card">
+    <h3>Bedrock Native Web Search</h3>
+    <p class="why">
+      <strong>What:</strong> AWS's other Web Search launch (Aug 2026) — a
+      built-in tool on the Responses API, no Gateway involved.
+      <strong>Why:</strong> the natural comparison arm — same idea, entirely
+      different integration path, model, and billing model.
+    </p>
+    <a href="/native-search">Bedrock Native Web Search — Responses API →</a>
+  </div>
+</div>
+{% endblock %}

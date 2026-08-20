@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cost_badge %}
+{% block title %}Query Ledger ($7 / 1,000 Queries){% endblock %}
+{% block content %}
+<h2>Query Ledger ($7 / 1,000 Queries)</h2>
+<p class="intro">
+  Every call to Web Search anywhere on this site — raw search, compare,
+  parameter sweep, agent loop — is logged here and costs real money. This
+  page is the running total, so "how much did I spend learning this" has an
+  actual answer instead of a shrug.
+</p>
+<div class="card">
+  <p class="why">
+    <strong>What:</strong> billed queries vs. cache hits, and the dollar
+    total. <strong>Why you should care:</strong> at $7 per 1,000 queries
+    ($0.007 each), casual exploration is genuinely cheap — but it's not
+    free, and a runaway loop or an unauthenticated public endpoint could
+    rack up a real bill without anyone noticing. Repeat queries (same tool +
+    query + params) are served from the on-disk cache and don't re-bill.
+  </p>
+  <p>{{ cost_badge(totals) }}</p>
+</div>
+<div class="card">
+  <p class="why">
+    <strong>Bedrock Native Web Search (Responses API):</strong> billed as
+    model tokens + Web Search pricing, decided by however many searches the
+    model runs per turn — not this connector's flat per-query rate, so no
+    dollar total is shown here. See the
+    <a href="https://aws.amazon.com/bedrock/pricing/" target="_blank" rel="noopener">Bedrock pricing page</a>
+    for the actual rate.
+  </p>
+  <p>
+    <span class="badge badge-web">{{ totals.native_web_search_calls }} live calls</span>
+    <span class="badge badge-kg">{{ totals.native_web_search_cache_hits }} cache hits</span>
+  </p>
+</div>
+{% endblock %}

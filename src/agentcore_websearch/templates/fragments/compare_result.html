@@ -1,0 +1,12 @@
+{% from "_macros.html" import result_card %}
+<div class="grid-2">
+  {% for comp in comparisons %}
+    <div class="card">
+      <p><strong>[{{ comp.label }}]</strong> {{ comp.query }}
+        {% if comp.cache_hit %}<span class="badge badge-kg">cached</span>{% endif %}
+      </p>
+      <p>{{ comp.knowledge_graph_count }} knowledge-graph, {{ comp.web_count }} web</p>
+      {% for r in comp.results %}{{ result_card(r) }}{% endfor %}
+    </div>
+  {% endfor %}
+</div>

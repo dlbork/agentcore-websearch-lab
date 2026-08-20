@@ -1,0 +1,16 @@
+{% macro result_card(r) %}
+<div class="result-card {{ 'kg' if r.kind == 'knowledge_graph' else 'web' }}">
+  <span class="badge {{ 'badge-kg' if r.kind == 'knowledge_graph' else 'badge-web' }}">
+    {{ '[knowledge-graph result]' if r.kind == 'knowledge_graph' else '[web result]' }}
+  </span>
+  {% if r.title %}<div><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.title }}</a></div>{% endif %}
+  <div>{{ r.text }}</div>
+  <div class="meta">publishedDate: {{ r.published_date or "null" }}</div>
+</div>
+{% endmacro %}
+
+{% macro cost_badge(totals) %}
+<span class="badge badge-web">{{ totals.billed_queries }} billed</span>
+<span class="badge badge-kg">{{ totals.cache_hits }} cache hits</span>
+<span class="badge" style="background: rgba(111,179,255,0.15); color: var(--accent);">${{ "%.4f"|format(totals.cost_usd) }}</span>
+{% endmacro %}

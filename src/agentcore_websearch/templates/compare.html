@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Knowledge Graph vs. Web Snippet{% endblock %}
+{% block content %}
+<h2>Knowledge Graph vs. Web Snippet</h2>
+<p class="intro">
+  AWS's blog claims Web Search does two different things depending on the
+  query: factual questions get a distinct "knowledge graph" result shape,
+  everything else gets ordinary web snippets. This page tests that claim
+  directly instead of taking the marketing copy at face value — run a
+  factual query and an open-ended one side by side and see what actually
+  comes back.
+</p>
+{% if not gateway_ready %}
+  <p class="status-missing">Gateway isn't ready yet — <a href="/gateway">provision it first</a>.</p>
+{% else %}
+  <p class="why">
+    <strong>What we've found so far:</strong> AWS's docs describe
+    knowledge-graph hits as coming back with <code>title</code>/<code>url</code>
+    null. Empirically, that has never happened here across 6 varied factual
+    queries — every result observed so far is web-snippet shaped. The
+    classifier below still checks for it. <strong>Why you should care:</strong>
+    if you're designing an app around a knowledge-graph/web-snippet
+    distinction, verify it against your own queries first — the docs and
+    reality don't obviously agree.
+  </p>
+  <p class="why">
+    <strong>Another gotcha, if you try it:</strong> querying something like
+    <em>"today's date"</em> returns confidently wrong answers — different
+    sources disagree by days. That's not a bug in this app; it's what this
+    tool actually is. Web Search is an index of <em>crawled, cached pages</em>,
+    not a live clock. A "today's date" page computes its answer when
+    <em>it's</em> rendered, but the crawler only captured a snapshot from
+    whenever it last indexed that page — so you get a stale answer served
+    as if it were current. <strong>Why you should care:</strong> grounding
+    via search works for facts a page states (prices, news, who's the CEO)
+    and breaks down for anything requiring live computation relative to
+    "now."
+  </p>
+
+  <form hx-post="/compare" hx-target="#compare-result" hx-swap="innerHTML">
+    <label for="factual_query">factual query</label>
+    <input type="text" id="factual_query" name="factual_query" value="who is the CEO of Amazon" required>
+    <label for="open_ended_query">open-ended query</label>
+    <input type="text" id="open_ended_query" name="open_ended_query" value="latest AWS re:Invent announcements" required>
+    <button type="submit">Compare</button>
+  </form>
+  <div id="compare-result"></div>
+
+  <h3>Parameter matrix: maxResults (1–25)</h3>
+  <p class="why">
+    <strong>What:</strong> the discovered <code>WebSearchTool</code> schema
+    only exposes <code>query</code> and <code>maxResults</code> — no
+    date/domain filter, despite what you might expect from a search API.
+    This sweeps <code>maxResults</code> at 1, 5, 10, 25 for one query so you
+    can see how result count actually scales (it doesn't always hit the
+    number you ask for). <strong>Why:</strong> knowing the full parameter
+    surface up front saves you from designing around a filter that doesn't
+    exist.
+  </p>
+  <form hx-post="/compare/sweep" hx-target="#sweep-result" hx-swap="innerHTML">
+    <label for="sweep_query">query</label>
+    <input type="text" id="sweep_query" name="sweep_query" value="AWS re:Invent" required>
+    <button type="submit">Run sweep</button>
+  </form>
+  <div id="sweep-result"></div>
+{% endif %}
+{% endblock %}

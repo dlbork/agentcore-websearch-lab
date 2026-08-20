@@ -1,0 +1,29 @@
+<div class="card">
+  <p>
+    <span class="badge {{ 'badge-kg' if cache_hit else 'badge-web' }}">
+      {{ 'served from cache — not re-billed' if cache_hit else 'live Responses API call' }}
+    </span>
+    <span class="badge" style="background: rgba(111,179,255,0.15); color: var(--accent);">
+      {{ 'cache lookup' if cache_hit else 'AWS API call' }}: {{ "%.0f"|format(elapsed_ms) }} ms
+    </span>
+    <span class="badge">external_web_access={{ external_web_access }}</span>
+  </p>
+  <div class="result-card web">
+    <div>{{ answer_text }}</div>
+  </div>
+  {% if citations %}
+    <h4>Citations</h4>
+    <ul>
+      {% for c in citations %}
+        <li><a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.title }}</a>
+          <span class="meta">[{{ c.start_index }}:{{ c.end_index }}]</span></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="status-missing">No citations — the model answered without calling Web Search, or external access was denied on every Fetch.</p>
+  {% endif %}
+  <details>
+    <summary>Raw Responses API payload</summary>
+    <pre>{{ raw_json }}</pre>
+  </details>
+</div>

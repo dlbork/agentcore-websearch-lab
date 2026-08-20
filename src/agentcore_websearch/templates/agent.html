@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Agentic Tool-Calling Loop — Hand-Rolled{% endblock %}
+{% block content %}
+<h2>Agentic Tool-Calling Loop — Hand-Rolled</h2>
+<p class="intro">
+  Every earlier page called the Web Search tool directly, on your command.
+  This page is the actual point of an agentic tool: an LLM decides for
+  itself, per prompt, whether it needs to search the web or already knows
+  the answer. This is the "how do I develop with it" payoff — the raw
+  <code>tool_use</code>/<code>tool_result</code> loop against Bedrock's
+  <code>converse()</code> API, hand-rolled with no LangChain, no Strands, so
+  every decision the model makes is visible instead of hidden inside a
+  framework.
+</p>
+{% if not gateway_ready %}
+  <p class="status-missing">Gateway isn't ready yet — <a href="/gateway">provision it first</a>.</p>
+{% else %}
+  <p class="why">
+    <strong>What to watch for:</strong> each turn streams live below as it
+    happens — the model's reasoning, whether it calls the tool, the raw
+    result it gets back, and its final answer. <strong>Why you should
+    care:</strong> try a time-sensitive prompt (stock price, today's news)
+    and a general-knowledge one (basic arithmetic, a well-known fact) back
+    to back — watching the model correctly decide when search is worth the
+    $0.007 is more informative than any documentation about "agentic tool
+    use."
+  </p>
+  <form method="get" action="/agent">
+    <label for="prompt">prompt</label>
+    <input type="text" id="prompt" name="prompt"
+           value="{{ prompt or 'What is the current stock price of Amazon (AMZN) today?' }}" required>
+    <button type="submit">Run</button>
+  </form>
+  {% if prompt %}
+    <p>Prompt: <strong>{{ prompt }}</strong></p>
+    <button type="button" id="stop-btn" class="danger" onclick="
+        document.getElementById('turns').remove();
+        document.getElementById('stop-btn').style.display = 'none';
+        document.getElementById('stopped-msg').style.display = 'block';
+      ">Stop</button>
+    <p id="stopped-msg" class="status-missing" style="display:none;">
+      Stopped — removing the streaming element closes its EventSource, which the
+      server detects and cancels the loop mid-turn (no more billed tool calls
+      after this point).
+    </p>
+    <div id="turns" hx-ext="sse" sse-connect="/agent/stream?prompt={{ prompt | urlencode }}"
+         sse-swap="message" hx-swap="beforeend"></div>
+  {% endif %}
+{% endif %}
+{% endblock %}

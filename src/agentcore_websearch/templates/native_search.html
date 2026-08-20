@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Bedrock Native Web Search — Responses API{% endblock %}
+{% block content %}
+<h2>Bedrock Native Web Search — Responses API</h2>
+<p class="intro">
+  A second, unrelated way to get web-grounded answers out of Bedrock,
+  launched August 2026: a built-in server-side <code>web_search</code> tool
+  on the OpenAI-compatible Responses API, called against the
+  <code>bedrock-mantle</code> endpoint. No AgentCore Gateway, no MCP, no
+  Converse <code>toolConfig</code> — the model (<code>openai.gpt-5.6-terra</code>)
+  decides on its own whether and how many times to search, and returns an
+  answer with inline citations instead of a raw results list.
+</p>
+<p class="why">
+  <strong>What's happening:</strong> your prompt goes straight to the model;
+  it calls Web Search itself, as many times as it wants, within one turn.
+  <strong>Why you should care:</strong> <code>external_web_access</code> is
+  off by default below — with it unchecked, results come from Bedrock's own
+  AWS-hosted web index/cache, not a live fetch, and your data never leaves
+  the AWS boundary. This lab's IAM identity also holds
+  <code>bedrock-websearch:ExternalWebAccess</code>, so checking the box lets
+  the model fetch the live internet directly — useful for anything the
+  cached index won't have (right-now prices, today's weather), but AWS
+  flags it as a real data-exfiltration surface for untrusted prompts, so
+  leave it off unless you're testing that arm specifically. Billing here
+  isn't the AgentCore connector's flat $7/1,000 queries — it's model tokens
+  plus Web Search's own pricing, decided by however many searches the model
+  chooses to run. See the <a href="/costs">ledger</a> for call counts (no
+  dollar total — see why there).
+</p>
+<form hx-post="/native-search" hx-target="#native-search-result" hx-swap="innerHTML">
+  <label for="prompt">prompt</label>
+  <input type="text" id="prompt" name="prompt" value="What are the most significant AWS launches announced this month?" required>
+  <label for="external_web_access">
+    <input type="checkbox" id="external_web_access" name="external_web_access" value="true">
+    external_web_access — fetch the live internet instead of Bedrock's cached index
+  </label>
+  <button type="submit">Ask with Web Search</button>
+</form>
+<div id="native-search-result"></div>
+{% endblock %}

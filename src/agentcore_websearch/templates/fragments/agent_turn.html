@@ -1,0 +1,14 @@
+<div class="turn {{ turn.kind }}">
+  <div class="kind">{{ turn.kind }}</div>
+  {% if turn.kind == 'model_text' %}
+    <div>{{ turn.text }}</div>
+  {% elif turn.kind == 'tool_use' %}
+    <div><code>{{ turn.name }}</code>({{ turn.input | tojson }})</div>
+  {% elif turn.kind == 'tool_result' %}
+    <div>{{ turn.output.results | default([]) | length }} results
+      {% if turn.cache_hit %}<span class="badge badge-kg">cached</span>{% endif %}
+    </div>
+  {% elif turn.kind == 'final' %}
+    <div><strong>{{ turn.text }}</strong></div>
+  {% endif %}
+</div>

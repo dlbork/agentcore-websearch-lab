@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}MCP Tool Discovery (tools/list){% endblock %}
+{% block content %}
+<h2>MCP Tool Discovery (<code>tools/list</code>)</h2>
+<p class="intro">
+  Every MCP client's first move is to ask a server "what tools do you
+  have?" — that's <code>tools/list</code>. This page makes that literal
+  call against the Gateway and shows exactly what comes back: the real
+  tool name and its full input schema, straight from AWS, not from
+  documentation that might be stale or paraphrased.
+</p>
+{% if not gateway_ready %}
+  <p class="status-missing">Gateway isn't ready yet — <a href="/gateway">provision it first</a>.</p>
+{% else %}
+  <p class="why">
+    <strong>Why you should care:</strong> the tool name and parameters
+    shown below are what every other page — and any agent you build — has
+    to work with. Two things worth noticing when you look: the real tool
+    name doesn't match the connector's config name, and the schema is
+    smaller than AWS's blog post implies (no date filter, no domain filter,
+    no separate knowledge-graph toggle — just <code>query</code> and
+    <code>maxResults</code>).
+  </p>
+  {% for tool in tools %}
+    <div class="card">
+      <p><strong>{{ tool.name }}</strong></p>
+      <pre>{{ tool.inputSchema | tojson(indent=2) }}</pre>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

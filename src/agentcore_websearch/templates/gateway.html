@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Gateway & Web Search Connector Setup{% endblock %}
+{% block content %}
+<h2>Gateway &amp; Web Search Connector Setup</h2>
+<p class="intro">
+  AgentCore's Gateway is the piece that routes an agent's tool calls through
+  managed connectors — it's what turns "Amazon runs a web index" into
+  "your code can call a tool named <code>WebSearch</code>." This page is the
+  plumbing every tutorial skips: without a Gateway and a Web Search target
+  provisioned here, every other page on this site has nothing to talk to.
+</p>
+<p class="why">
+  <strong>Two separate IAM sides, and why both exist:</strong>
+  <strong>outbound</strong> — the Gateway's own service role needs
+  <code>bedrock-agentcore:InvokeWebSearch</code> on the managed web-search
+  tool, so the Gateway itself can reach AWS's index. <strong>inbound</strong>
+  — whoever calls the Gateway (this app) needs
+  <code>bedrock-agentcore:InvokeGateway</code> on the Gateway ARN, so AWS
+  knows you're allowed to use it. With <code>authorizerType=AWS_IAM</code>
+  that's a plain SigV4-signed call — no Cognito/OAuth setup required, which
+  is the difference between a five-minute personal project and a half-day
+  identity-provider integration.
+</p>
+
+<div class="card">
+  {% if gateway %}
+    <p>Status: <strong class="status-{{ 'ready' if gateway.gateway_status == 'READY' else 'pending' }}">{{ gateway.gateway_status }}</strong></p>
+    <p>Gateway ARN: <code>{{ gateway.gateway_arn }}</code></p>
+    <p>Gateway URL: <code>{{ gateway.gateway_url }}</code></p>
+    {% for t in gateway.targets %}
+      <p>Target <code>{{ t.id }}</code>: <strong class="status-{{ 'ready' if t.status == 'READY' else 'pending' }}">{{ t.status }}</strong></p>
+    {% endfor %}
+    <form hx-post="/gateway/teardown" hx-target="#gateway-result" hx-swap="innerHTML">
+      <button type="submit" class="danger">Tear down Gateway</button>
+    </form>
+  {% else %}
+    <p class="status-missing">No Gateway provisioned.</p>
+    <form hx-post="/gateway" hx-target="#gateway-result" hx-swap="innerHTML">
+      <button type="submit">Provision Gateway + Web Search Target</button>
+    </form>
+  {% endif %}
+  <div id="gateway-result"></div>
+</div>
+{% endblock %}

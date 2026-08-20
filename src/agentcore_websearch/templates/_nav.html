@@ -1,0 +1,11 @@
+<nav>
+  <a href="/" class="{{ 'active' if active == 'dashboard' else '' }}">AgentCore Gateway Status</a>
+  <a href="/gateway" class="{{ 'active' if active == 'gateway' else '' }}">Gateway &amp; Web Search Connector Setup</a>
+  <a href="/tools" class="{{ 'active' if active == 'tools' else '' }}">MCP Tool Discovery (tools/list)</a>
+  <a href="/search" class="{{ 'active' if active == 'search' else '' }}">Web Search — Raw tools/call</a>
+  <a href="/compare" class="{{ 'active' if active == 'compare' else '' }}">Knowledge Graph vs. Web Snippet</a>
+  <a href="/agent" class="{{ 'active' if active == 'agent' else '' }}">Agentic Tool-Calling Loop — Hand-Rolled</a>
+  <a href="/agent/strands" class="{{ 'active' if active == 'agent_strands' else '' }}">Agentic Tool-Calling Loop — Strands</a>
+  <a href="/native-search" class="{{ 'active' if active == 'native_search' else '' }}">Bedrock Native Web Search — Responses API</a>
+  <a href="/costs" class="{{ 'active' if active == 'costs' else '' }}">Query Ledger ($7 / 1,000 Queries)</a>
+</nav>
